@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(AudioSource))]
 
@@ -14,6 +15,17 @@ public class recordplay : MonoBehaviour
 
     //A handle to the attached AudioSource  
     private AudioSource goAudioSource;
+
+    float timeLeft = 5.0f;
+    float recordTime;
+    public GameObject timer;
+    Text timertext;
+    int count = 0;
+
+    void Awake()
+    {
+        timertext = timer.GetComponent<Text>();
+    }
 
     //Use this for initialization  
     void Start()
@@ -44,32 +56,51 @@ public class recordplay : MonoBehaviour
         }
     }
 
+    void Update()
+    {
+        timeLeft -= Time.deltaTime;
+        if (timeLeft <= 0.0f)
+        {
+            timeLeft = 0.0f;
+            count = 1;
+            timer.SetActive(false);
+        }
+        if (count == 1)
+            recordTime += Time.deltaTime;
+
+        timertext.text = "time Left:" + timeLeft;
+
+    }
+
     void OnGUI()
     {
         //If there is a microphone  
         if (micConnected)
         {
             //If the audio from any microphone isn't being captured  
-            if (!Microphone.IsRecording(null))
+            if (!Microphone.IsRecording(null) && (timeLeft == 0.0f))
             {
-                //Case the 'Record' button gets pressed  
-                if (GUI.Button(new Rect(Screen.width / 2 - 100, Screen.height / 2 - 25, 200, 50), "Record"))
-                {
-                    //Start recording and store the audio captured from the microphone at the AudioClip in the AudioSource  
-                    goAudioSource.clip = Microphone.Start(null, true, 20, maxFreq);
-                }
+                //Start recording and store the audio captured from the microphone at the AudioClip in the AudioSource  
+                goAudioSource.clip = Microphone.Start(null, true, 20, maxFreq);
+
             }
             else //Recording is in progress  
             {
-                //Case the 'Stop and Play' button gets pressed  
-                if (GUI.Button(new Rect(Screen.width / 2 - 100, Screen.height / 2 - 25, 200, 50), "Stop and Play!"))
+                if (timeLeft == 0.0f)
                 {
-                    SavWav.Save("myfile", goAudioSource.clip);
-                    Microphone.End(null); //Stop the audio recording  
-                    goAudioSource.Play(); //Playback the recorded audio  
-                }
+                    if (recordTime > 10.0f)
+                    {
+                        //Case the 'Stop and Play' button gets pressed  
+                        if (GUI.Button(new Rect(Screen.width / 2 - 100, Screen.height / 2 - 25, 200, 50), "Stop Recording!"))
+                        {
+                            SavWav.Save("myfile", goAudioSource.clip);
+                            Microphone.End(null); //Stop the audio recording  
+                            goAudioSource.Play(); //Playback the recorded audio  
+                        }
+                    }
 
-                GUI.Label(new Rect(Screen.width / 2 - 100, Screen.height / 2 + 25, 200, 50), "Recording in progress...");
+                    GUI.Label(new Rect(Screen.width / 2 - 100, Screen.height / 2 + 25, 200, 50), "Recording in progress...");
+                }
             }
         }
         else // No microphone  
