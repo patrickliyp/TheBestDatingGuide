@@ -5,13 +5,10 @@ using UnityEngine.UI;
 
 public class DialogueManager : MonoBehaviour {
 
-	//public Text nameText;
+	public Text nameText;
 	public Text dialogueText;
 
 	public Animator animator;
-    public GameObject test;
-    public GameObject menu;
-    public GameObject menuorder;
 
 	private Queue<string> sentences;
 
@@ -23,9 +20,8 @@ public class DialogueManager : MonoBehaviour {
 	public void StartDialogue (Dialogue dialogue)
 	{
 		animator.SetBool("IsOpen", true);
-        test.SetActive(false);
 
-		//nameText.text = dialogue.name;
+		nameText.text = dialogue.name;
 
 		sentences.Clear();
 
@@ -41,10 +37,8 @@ public class DialogueManager : MonoBehaviour {
 	{
 		if (sentences.Count == 0)
 		{
-            EndDialogue();
-            menu.SetActive(true);
-            menuorder.SetActive(true);
-            return;
+			EndDialogue();
+			return;
 		}
 
 		string sentence = sentences.Dequeue();
