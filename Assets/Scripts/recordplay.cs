@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(AudioSource))]
 
@@ -15,6 +16,7 @@ public class recordplay : MonoBehaviour
 
     //A handle to the attached AudioSource  
     private AudioSource goAudioSource;
+    public menurecord dialogue;
 
     float timeLeft = 5.0f;
     float recordTime;
@@ -58,19 +60,43 @@ public class recordplay : MonoBehaviour
 
     void Update()
     {
-        timeLeft -= Time.deltaTime;
-        if (timeLeft <= 0.0f)
+        if (dialogue.count == 1)
         {
-            timeLeft = 0.0f;
-            count = 1;
-            timer.SetActive(false);
+
+            timer.SetActive(true);
+            timeLeft -= Time.deltaTime;
+            if(timeLeft > 4.0f){
+                timertext.text = "Speak in: 5";
+            }
+            if(timeLeft > 3.0f && timeLeft <= 4.0f){
+                timertext.text = "Speak in: 4";
+            }
+            if (timeLeft > 2.0f && timeLeft <= 3.0f)
+            {
+                timertext.text = "Speak in: 3";
+            }
+            if (timeLeft > 1.0f && timeLeft <= 2.0f)
+            {
+                timertext.text = "Speak in: 2";
+            }
+            if (timeLeft > 0.0f && timeLeft <= 1.0f)
+            {
+                timertext.text = "Speak in: 1";
+            }
+            if (timeLeft <= 0.0f)
+            {
+                timeLeft = 0.0f;
+                count = 1;
+                timer.SetActive(false);
+            }
+            if (count == 1)
+                recordTime += Time.deltaTime;
+
+           // timertext.text = "time Left:" + timeLeft;
+
         }
-        if (count == 1)
-            recordTime += Time.deltaTime;
-
-        timertext.text = "time Left:" + timeLeft;
-
     }
+
 
     void OnGUI()
     {
@@ -91,10 +117,11 @@ public class recordplay : MonoBehaviour
                     if (recordTime > 10.0f)
                     {
                         //Case the 'Stop and Play' button gets pressed  
-                        if (GUI.Button(new Rect(Screen.width / 2 - 100, Screen.height / 2 - 25, 200, 50), "Stop Recording!"))
+                        if (GUI.Button(new Rect(Screen.width / 2 - 100, Screen.height / 2 + 50, 200, 50), "Stop Recording!"))
                         {
                             SavWav.Save("myfile", goAudioSource.clip);
                             Microphone.End(null); //Stop the audio recording  
+                            SceneManager.LoadScene(1);
                             goAudioSource.Play(); //Playback the recorded audio  
                         }
                     }
